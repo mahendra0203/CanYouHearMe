@@ -33,8 +33,8 @@ def run_inference(model, dataloader, tokenizer, device, num_samples=10):
             
             sampled = torch.multinomial(op_logits[:, -1, :].softmax(dim=-1), caption_labels.shape[1])
             
-            ground_truth = tokenizer.batch_decode(batch['caption_ids'], skip_special_tokens=False)
-            generated = tokenizer.batch_decode(sampled,skip_special_tokens=False)
+            ground_truth = tokenizer.batch_decode(batch['caption_ids'], skip_special_tokens=True)
+            generated = tokenizer.batch_decode(sampled,skip_special_tokens=True)
             
             for gt, gen in zip(ground_truth, generated):
                 results.append({"Ground Truth": gt, "Generated": gen})
