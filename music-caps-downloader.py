@@ -98,6 +98,7 @@ if __name__ == '__main__':
 
   dataset = dataset['train']
 
+  #Local path on my system
   output_dir = os.path.join('/Users/m/code/multimodal-llm', "new_full_dataset/musiccaps_audio_data")
 
   print(f"train_len: {len(dataset)}")
@@ -108,6 +109,7 @@ if __name__ == '__main__':
   full_dataset = create_audio_caption_dataset(dataset, output_dir, sample_range=full_dataset_range)
 
   print(f"New val dataset size: {len(full_dataset)}")
+   #Local path on my system
   full_train_path = os.path.join('/Users/m/code/multimodal-llm', "new_full_dataset/train/train_musiccaps_audio_data")
 
   print("save the full dataset to disk")
