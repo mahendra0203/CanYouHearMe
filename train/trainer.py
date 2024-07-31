@@ -52,7 +52,7 @@ class MultiModalDataset(Dataset):
         return self.dataloader.dataset[idx]
 
 class MultiModalTrainer(Trainer):
-    def __init__(self, test_dataloader, tokenizer,device, model, test_steps=500,  *args, **kwargs):
+    def __init__(self, test_dataloader, tokenizer,device,test_steps=500,  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.test_dataloader = test_dataloader
         self.test_step = 0

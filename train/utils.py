@@ -46,6 +46,14 @@ def pad_sequence_start(sequences, batch_first=False, padding_value=0.0):
 def move_to_device(batch, device=DEVICE):
     return {k: v.to(device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
 
+def move_model_to_gpu(model):
+    if torch.cuda.is_available():
+        model = model.cuda()
+        for param in model.parameters():
+            param.data = param.data.cuda()
+            if param.grad is not None:
+                param.grad.data = param.grad.data.cuda()
+    return model
 def log_results_to_wandb(results):
     table = wandb.Table(columns=["Ground Truth", "Generated"])
     for result in results:

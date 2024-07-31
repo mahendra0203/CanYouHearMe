@@ -4,14 +4,15 @@ from huggingface_hub import login
 import wandb
 
 from transformers import TrainingArguments
+from datasets import load_from_disk
 
 import config
 from data_processing import load_and_prepare_dataset, prepare_dataset, create_dataloaders
 from model import MultiModalLLM
-from utils import move_to_device
+from utils import move_to_device, move_model_to_gpu
 from trainer import MultiModalTrainer
 
-from data_processing import tokenizer
+from data_processing import tokenizer, collate_fn
 
 def main():
     print(config.LEARNING_RATE)
@@ -19,9 +20,11 @@ def main():
     print(config.WANDB_RUN_NAME)
 
     #TODO: add a better way to do login, maybe environment variables 
-    login()
+    login(new_session=False)
     wandb.login()
-    
+
+    wandb.init(project=config.WANDB_PROJECT, name=config.WANDB_RUN_NAME)
+
     # Load and prepare datasets
     train_dataset, val_dataset, test_dataset = load_and_prepare_dataset()
     
@@ -34,12 +37,21 @@ def main():
     val_dataset = val_dataset.map(prepare_dataset, remove_columns=val_dataset.column_names, num_proc=config.NUM_WORKERS)
     test_dataset = test_dataset.map(prepare_dataset, remove_columns=test_dataset.column_names, num_proc=config.NUM_WORKERS)
 
+    train_dataset.save_to_disk('/home/mapped_dataset/train/')
+    val_dataset.save_to_disk('/home/mapped_dataset/val/')
+    test_dataset.save_to_disk('/home/mapped_dataset/test/')
+
+    ####Only for the second or subsequent tries, dont have do the mapping again, it takes a while
+    # train_dataset = load_from_disk('/home/mapped_dataset/train/')
+    # val_dataset = load_from_disk('/home/mapped_dataset/val/')
+    # test_dataset = load_from_disk('/home/mapped_dataset/test/')
+    ###Second try end
     # Create dataloaders
     train_dataloader, val_dataloader, test_dataloader = create_dataloaders(train_dataset, val_dataset, test_dataset)
 
     #Create the model
     model = MultiModalLLM(config.WHISPER_MODEL_NAME, config.LLM_MODEL_NAME)
-    model = move_to_device(model)
+    model = move_model_to_gpu(model)
 
     # Define training arguments
     training_args = TrainingArguments(
@@ -65,16 +77,29 @@ def main():
     trainer = MultiModalTrainer(
         model=model,
         args=training_args,
+        data_collator=collate_fn,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         test_dataloader=test_dataloader,
         tokenizer=tokenizer,
-        test_steps=config.EVAL_STEPS,
+        test_steps=config.TEST_STEPS,
         device=config.DEVICE,
     )
 
+# # Initialize Trainer
+# trainer = MultiModalTrainer(
+#         model=model,
+#         args=training_args,
+#         data_collator=collate_fn,
+#         train_dataset=new_train_dataset,
+#         eval_dataset=new_val_dataset,
+#         test_dataloader=test_dataloader,
+#         tokenizer=tokenizer,
+#         test_steps=500
+#     )
     # Train the model
-    trainer.train(resume_from_checkpoint=True)
+    # trainer.train(resume_from_checkpoint=True)
+    trainer.train()
 
     # Save the final model
     trainer.save_model()

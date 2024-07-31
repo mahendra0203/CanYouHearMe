@@ -14,20 +14,21 @@ NUM_WORKERS = 8
 # Training settings
 LEARNING_RATE = 1.5e-3
 NUM_TRAIN_EPOCHS = 1
-WARMUP_STEPS = 250
+WARMUP_STEPS = 2
 WEIGHT_DECAY = 0.01
-LOGGING_STEPS = 250
-EVAL_STEPS = 500
-SAVE_STEPS = 1000
-MAX_STEPS = 3000
+LOGGING_STEPS = 5
+EVAL_STEPS = 5
+SAVE_STEPS = 10
+MAX_STEPS = 10
+TEST_STEPS = 2
 
 # Device settings
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Wandb settings
-WANDB_PROJECT = "multilm-llama3-whisper-large-v2"
+WANDB_PROJECT = "multilm-refactored"
 WANDB_RUN_NAME = "refactored_run"
 
 # Paths
-OUTPUT_DIR = "./results"
-LOGGING_DIR = "./logs"
+OUTPUT_DIR = "./results_new"
+LOGGING_DIR = "./logs_new"
