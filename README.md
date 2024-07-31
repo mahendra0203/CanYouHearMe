@@ -17,9 +17,13 @@ export WANDB_API_KEY=""
 
 **3. Make any changes required in train/config.py and then run main.py**
 ```
-vi train/config.py
-cd train
+#Open the config file
+vi train/config.py #You can edit config.py using your own editor, if not vim
 
+# cd to the 'train' directory
+cd train 
+
+#run main.py
 python main.py
 ```
 
